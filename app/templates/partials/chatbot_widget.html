@@ -1,0 +1,76 @@
+<div id="unibot" class="fixed bottom-5 right-5 z-[9999]">
+  <button id="unibot-toggle"
+    class="w-16 h-16 bg-gradient-to-br from-forum-base to-forum-dark rounded-full shadow-xl
+           flex items-center justify-center text-white hover:scale-110 transition-all
+           hover:shadow-blue-400/40 hover:shadow-2xl group" title="UniBot">
+    <i id="unibot-icon-chat" class="fas fa-robot text-2xl"></i>
+    <i id="unibot-icon-close" class="fas fa-times text-2xl hidden"></i>
+    <span id="unibot-dot"
+      class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full
+             flex items-center justify-center animate-bounce">1</span>
+  </button>
+
+  <div id="unibot-window"
+    class="hidden absolute bottom-20 right-0 w-[380px] sm:w-[420px] h-[560px]
+           bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden">
+    <div class="bg-gradient-to-r from-forum-base to-forum-dark px-5 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+          <i class="fas fa-robot text-white text-lg"></i>
+        </div>
+        <div>
+          <h3 class="text-white font-bold">UniBot RAG</h3>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+            <span class="text-blue-100 text-xs">Qwen + ChromaDB</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button id="unibot-clear" class="text-white/70 hover:text-white p-1.5 rounded hover:bg-white/10" title="Xóa">
+          <i class="fas fa-trash-alt text-sm"></i>
+        </button>
+        <button id="unibot-min" class="text-white/70 hover:text-white p-1.5 rounded hover:bg-white/10" title="Đóng">
+          <i class="fas fa-chevron-down text-sm"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="unibot-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50"></div>
+
+    <div id="unibot-quick" class="px-4 py-2 border-t bg-white overflow-x-auto">
+      <div class="flex gap-2 text-xs whitespace-nowrap">
+        <button data-q="Hướng dẫn cách đăng ký tín chỉ" class="ub-quick px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full hover:bg-blue-100 font-medium">
+          <i class="fas fa-plus-circle mr-1"></i>Đăng ký TC
+        </button>
+        <button data-q="Xem lịch học của tôi học kỳ này" class="ub-quick px-3 py-1.5 bg-green-50 text-green-700 rounded-full hover:bg-green-100 font-medium">
+          <i class="fas fa-calendar mr-1"></i>Lịch học
+        </button>
+        <button data-q="Có những tài liệu nào trên hệ thống?" class="ub-quick px-3 py-1.5 bg-purple-50 text-purple-700 rounded-full hover:bg-purple-100 font-medium">
+          <i class="fas fa-file-alt mr-1"></i>Tài liệu
+        </button>
+        <button data-q="Học kỳ này có những giảng viên nào dạy?" class="ub-quick px-3 py-1.5 bg-teal-50 text-teal-700 rounded-full hover:bg-teal-100 font-medium">
+          <i class="fas fa-chalkboard-teacher mr-1"></i>Giảng viên
+        </button>
+        <button data-q="Thông báo mới nhất từ nhà trường" class="ub-quick px-3 py-1.5 bg-pink-50 text-pink-700 rounded-full hover:bg-pink-100 font-medium">
+          <i class="fas fa-bell mr-1"></i>Thông báo
+        </button>
+      </div>
+    </div>
+
+    <form id="unibot-form" class="px-4 py-3 border-t bg-white">
+      <div class="flex items-end gap-2">
+        <textarea id="unibot-input" rows="1" maxlength="1000"
+          placeholder="Hỏi UniBot bất cứ điều gì..."
+          class="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm resize-none
+                 focus:ring-2 focus:ring-forum-base focus:border-forum-base outline-none max-h-24"></textarea>
+        <button type="submit" id="unibot-send"
+          class="w-10 h-10 bg-forum-base text-white rounded-xl flex items-center justify-center
+                 hover:bg-forum-dark transition disabled:opacity-50">
+          <i class="fas fa-paper-plane text-sm"></i>
+        </button>
+      </div>
+      <p class="text-center text-xs text-gray-400 mt-1.5">UniBot có thể sai — kiểm tra thông tin quan trọng.</p>
+    </form>
+  </div>
+</div>

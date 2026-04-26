@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Đăng ký tín chỉ — {{ APP_NAME }}{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-forum-dark mb-4"><i class="fas fa-clipboard-check mr-1"></i> Đăng ký tín chỉ</h1>
+
+<div class="bg-blue-50 border border-blue-200 text-sm text-blue-800 rounded p-3 mb-4">
+  <i class="fas fa-info-circle mr-1"></i>
+  Học kỳ <b>{{ sem.name }} {{ sem.academic_year }}</b> ·
+  Đăng ký từ {{ sem.registration_start.strftime('%d/%m/%Y') }} đến {{ sem.registration_end.strftime('%d/%m/%Y') }}
+</div>
+
+<form class="bg-white rounded-lg p-3 shadow-sm mb-4 flex gap-2">
+  <input name="q" value="{{ q }}" placeholder="Tìm theo mã môn, tên môn, giảng viên..."
+         class="flex-1 border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-forum-base">
+  <button class="bg-forum-base hover:bg-forum-dark text-white px-4 py-2 rounded-lg text-sm font-semibold">
+    <i class="fas fa-search mr-1"></i> Tìm
+  </button>
+</form>
+
+<div class="bg-white rounded-lg shadow-sm overflow-x-auto">
+  <table class="w-full text-sm min-w-[800px]">
+    <thead class="bg-forum-dark text-white">
+      <tr>
+        <th class="px-3 py-2.5 text-left">Mã môn</th>
+        <th class="px-3 py-2.5 text-left">Tên môn</th>
+        <th class="px-3 py-2.5 text-center">TC</th>
+        <th class="px-3 py-2.5 text-left">Lớp</th>
+        <th class="px-3 py-2.5 text-left">Giảng viên</th>
+        <th class="px-3 py-2.5">Lịch</th>
+        <th class="px-3 py-2.5 text-center">SS</th>
+        <th class="px-3 py-2.5"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cs in sections %}{% set c = cs.course %}
+      <tr class="border-t hover:bg-gray-50">
+        <td class="px-3 py-2 font-mono text-xs">{{ c.code }}</td>
+        <td class="px-3 py-2 font-medium">{{ c.name }}</td>
+        <td class="px-3 py-2 text-center">{{ c.credits }}</td>
+        <td class="px-3 py-2 text-xs">{{ cs.section_code }}</td>
+        <td class="px-3 py-2 text-xs">{{ cs.instructor_name }}</td>
+        <td class="px-3 py-2 text-xs">{{ day_vn[cs.day_of_week] }} t.{{ cs.start_period }}-{{ cs.end_period }}<br>{{ cs.room }}</td>
+        <td class="px-3 py-2 text-center text-xs">{{ cs.current_students }}/{{ cs.max_students }}</td>
+        <td class="px-3 py-2 text-right">
+          {% if cs.id in enrolled_ids %}
+            <form method="POST" action="{{ url_for('student.drop_action', section_id=cs.id) }}" class="inline">
+              <button class="bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1 rounded text-xs font-semibold">
+                <i class="fas fa-times"></i> Hủy
+              </button>
+            </form>
+          {% elif cs.is_full %}
+            <span class="text-xs text-gray-400">Đầy</span>
+          {% else %}
+            <form method="POST" action="{{ url_for('student.enroll_action', section_id=cs.id) }}" class="inline">
+              <button class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-xs font-semibold">
+                <i class="fas fa-plus"></i> Đăng ký
+              </button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8" class="px-4 py-8 text-center text-gray-400 italic">Không tìm thấy lớp.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

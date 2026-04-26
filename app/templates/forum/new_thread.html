@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Tạo chủ đề — {{ category.name }}{% endblock %}
+{% block content %}
+<nav class="text-sm text-gray-500 mb-3">
+  <a href="{{ url_for('forum.index') }}" class="hover:text-forum-base">Diễn đàn</a>
+  <i class="fas fa-chevron-right text-xs mx-1"></i>
+  <a href="{{ url_for('forum.category', slug=category.slug) }}" class="hover:text-forum-base">{{ category.name }}</a>
+  <i class="fas fa-chevron-right text-xs mx-1"></i>
+  <span class="text-gray-700">Tạo chủ đề</span>
+</nav>
+
+<form method="POST" class="bg-white rounded-lg shadow-sm p-6">
+  <h2 class="text-xl font-bold text-forum-dark mb-4"><i class="fas fa-pen mr-1"></i> Tạo chủ đề mới</h2>
+  <label class="block text-sm font-semibold mb-1">Tiêu đề</label>
+  <input name="title" required maxlength="255"
+    class="w-full border rounded-lg px-3 py-2 mb-4 focus:ring-2 focus:ring-forum-base outline-none">
+
+  <label class="block text-sm font-semibold mb-1">Nội dung (markdown)</label>
+  <textarea name="content" rows="10" required
+    class="w-full border rounded-lg p-3 text-sm focus:ring-2 focus:ring-forum-base outline-none"></textarea>
+
+  <div class="mt-4 flex justify-end gap-2">
+    <a href="{{ url_for('forum.category', slug=category.slug) }}"
+       class="px-4 py-2 rounded-lg border text-sm hover:bg-gray-50">Hủy</a>
+    <button class="bg-forum-base hover:bg-forum-dark text-white px-5 py-2 rounded-lg text-sm font-semibold">
+      <i class="fas fa-check mr-1"></i> Đăng chủ đề
+    </button>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m py_compile config.py core/db.py core/nlp.py core/rag.py seed.py ingest.py app.py routes/auth.py routes/forum.py routes/student.py routes/chat.py)"
+    ]
+  }
+}

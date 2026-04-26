@@ -1,0 +1,38 @@
+/* Forum styles inspired by diendan.vnedu.vn */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn { animation: fadeIn .25s ease-out; }
+
+.forum-row {
+  display: grid;
+  grid-template-columns: 56px 1fr 200px 220px;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #eef2f7;
+  background: #fff;
+  transition: background .15s;
+}
+.forum-row:hover { background: #f9fbfd; }
+.forum-row .icon {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 20px;
+}
+@media (max-width: 768px) {
+  .forum-row { grid-template-columns: 48px 1fr; }
+  .forum-row .stats, .forum-row .last { display: none; }
+}
+.forum-row .stats, .forum-row .last { font-size: 12px; color: #64748b; }
+
+.unibot-bot-text p { margin-bottom: 0.5rem; }
+.unibot-bot-text p:last-child { margin-bottom: 0; }
+.unibot-bot-text ul { list-style: disc; padding-left: 1.25rem; margin: 0.25rem 0; }
+.unibot-bot-text strong { font-weight: 600; }
+
+#unibot-messages::-webkit-scrollbar { width: 5px; }
+#unibot-messages::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+.chat-page-input { box-shadow: 0 -8px 24px -12px rgba(0,0,0,.08); }

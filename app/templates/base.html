@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}{{ APP_NAME }}{% endblock %}</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        forum: { dark: '#0d4f7f', base: '#1574b9', light: '#3da9e0', bg: '#f5f7fa' }
+      },
+      fontFamily: { sans: ['Inter', 'Segoe UI', 'Roboto', 'sans-serif'] }
+    }
+  }
+}
+</script>
+</head>
+<body class="bg-forum-bg text-gray-800 font-sans min-h-screen flex flex-col">
+
+<div class="bg-forum-dark text-white text-xs">
+  <div class="max-w-7xl mx-auto px-4 py-1.5 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <a href="{{ url_for('forum.index') }}" class="hover:underline"><i class="fas fa-home mr-1"></i> Trang chủ</a>
+      <a href="{{ url_for('chat.page') }}" class="hover:underline"><i class="fas fa-robot mr-1"></i> Chat UniBot</a>
+    </div>
+    <div class="flex items-center gap-3">
+      {% if current_user.is_authenticated %}
+        <span class="hidden sm:inline">Xin chào, <b>{{ current_user.full_name }}</b></span>
+        {% if current_user.role == 'student' %}
+          <a href="{{ url_for('student.dashboard') }}" class="hover:underline"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</a>
+        {% endif %}
+        <a href="{{ url_for('auth.logout') }}" class="hover:underline"><i class="fas fa-sign-out-alt mr-1"></i>Đăng xuất</a>
+      {% else %}
+        <a href="{{ url_for('auth.login') }}" class="hover:underline"><i class="fas fa-sign-in-alt mr-1"></i>Đăng nhập</a>
+        <a href="{{ url_for('auth.register') }}" class="hover:underline"><i class="fas fa-user-plus mr-1"></i>Đăng ký</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<header class="bg-gradient-to-r from-forum-base to-forum-light shadow">
+  <div class="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4">
+    <a href="{{ url_for('forum.index') }}" class="flex items-center gap-3 text-white">
+      <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow">
+        <i class="fas fa-graduation-cap text-forum-dark text-2xl"></i>
+      </div>
+      <div>
+        <h1 class="font-bold text-xl leading-tight">UniReg Forum</h1>
+        <p class="text-xs text-blue-100">Diễn đàn sinh viên & trợ lý AI UniBot</p>
+      </div>
+    </a>
+
+    <form action="{{ url_for('forum.index') }}" class="ml-auto flex-1 max-w-md hidden md:block">
+      <div class="relative">
+        <input type="text" name="q" placeholder="Tìm kiếm trong diễn đàn..."
+               class="w-full pl-10 pr-3 py-2 rounded-full text-sm border-0 outline-none focus:ring-2 focus:ring-white/60">
+        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+      </div>
+    </form>
+
+    <a href="{{ url_for('chat.page') }}"
+       class="bg-yellow-400 hover:bg-yellow-300 text-forum-dark font-semibold text-sm px-4 py-2 rounded-full shadow flex items-center gap-2 transition">
+      <i class="fas fa-robot"></i> <span class="hidden sm:inline">Hỏi UniBot</span>
+    </a>
+  </div>
+</header>
+
+<nav class="bg-white border-b shadow-sm sticky top-0 z-30">
+  <div class="max-w-7xl mx-auto px-4 flex items-center overflow-x-auto">
+    <a href="{{ url_for('forum.index') }}"
+       class="flex-shrink-0 px-4 py-3 text-sm font-medium hover:bg-forum-bg border-b-2 border-transparent hover:border-forum-base">
+      <i class="fas fa-th-large mr-1.5"></i> Diễn đàn
+    </a>
+    {% for c in nav_categories %}
+    <a href="{{ url_for('forum.category', slug=c.slug) }}"
+       class="flex-shrink-0 px-4 py-3 text-sm hover:bg-forum-bg border-b-2 border-transparent hover:border-forum-base">
+      <i class="fas {{ c.icon }} mr-1.5 text-{{ c.color }}-600"></i> {{ c.name }}
+    </a>
+    {% endfor %}
+    {% if current_user.is_authenticated and current_user.role == 'student' %}
+    <span class="flex-shrink-0 mx-2 text-gray-300">|</span>
+    <a href="{{ url_for('student.registration') }}" class="flex-shrink-0 px-3 py-3 text-sm hover:bg-forum-bg">
+      <i class="fas fa-clipboard-check text-blue-600 mr-1"></i> Đăng ký TC
+    </a>
+    <a href="{{ url_for('student.schedule') }}" class="flex-shrink-0 px-3 py-3 text-sm hover:bg-forum-bg">
+      <i class="fas fa-calendar text-green-600 mr-1"></i> Lịch học
+    </a>
+    <a href="{{ url_for('student.materials') }}" class="flex-shrink-0 px-3 py-3 text-sm hover:bg-forum-bg">
+      <i class="fas fa-book text-purple-600 mr-1"></i> Tài liệu
+    </a>
+    <a href="{{ url_for('student.grades') }}" class="flex-shrink-0 px-3 py-3 text-sm hover:bg-forum-bg">
+      <i class="fas fa-chart-line text-orange-600 mr-1"></i> Điểm
+    </a>
+    {% endif %}
+  </div>
+</nav>
+
+{% with msgs = get_flashed_messages(with_categories=true) %}
+  {% if msgs %}
+  <div class="max-w-7xl mx-auto px-4 mt-3 space-y-2">
+    {% for cat, msg in msgs %}
+      <div class="px-4 py-2 rounded text-sm border
+        {% if cat == 'error' %} bg-red-50 border-red-200 text-red-800
+        {% elif cat == 'success' %} bg-green-50 border-green-200 text-green-800
+        {% else %} bg-blue-50 border-blue-200 text-blue-800 {% endif %}">
+        <i class="fas {% if cat == 'error' %}fa-exclamation-circle{% elif cat == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %} mr-1"></i>
+        {{ msg }}
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
+
+<main class="max-w-7xl mx-auto w-full px-4 py-6 flex-1">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="bg-forum-dark text-white text-sm mt-8">
+  <div class="max-w-7xl mx-auto px-4 py-6 grid md:grid-cols-3 gap-6">
+    <div>
+      <h4 class="font-bold mb-2"><i class="fas fa-graduation-cap mr-1"></i> UniReg</h4>
+      <p class="text-blue-100 text-xs">
+        Hệ thống đăng ký tín chỉ và diễn đàn sinh viên.
+        Tích hợp trợ lý AI UniBot trên RAG + Ollama (Qwen).
+      </p>
+    </div>
+    <div>
+      <h4 class="font-bold mb-2">Liên kết nhanh</h4>
+      <ul class="space-y-1 text-blue-100 text-xs">
+        <li><a href="{{ url_for('forum.index') }}" class="hover:underline">Diễn đàn</a></li>
+        <li><a href="{{ url_for('chat.page') }}" class="hover:underline">Chat UniBot</a></li>
+        <li><a href="{{ url_for('auth.login') }}" class="hover:underline">Đăng nhập</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-bold mb-2">Công nghệ</h4>
+      <p class="text-blue-100 text-xs">
+        Flask · LangChain · Ollama (Docker) · ChromaDB · Qwen 2.5 · NLP tiếng Việt.
+      </p>
+    </div>
+  </div>
+  <div class="border-t border-white/10 text-center py-2 text-xs text-blue-200">
+    © 2026 UniReg Forum. Powered by Python + RAG.
+  </div>
+</footer>
+
+{% include "partials/chatbot_widget.html" %}
+<script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

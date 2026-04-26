@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}{{ thread.title }} — {{ APP_NAME }}{% endblock %}
+{% block content %}
+<nav class="text-sm text-gray-500 mb-3">
+  <a href="{{ url_for('forum.index') }}" class="hover:text-forum-base">Diễn đàn</a>
+  <i class="fas fa-chevron-right text-xs mx-1"></i>
+  <a href="{{ url_for('forum.category', slug=thread.category.slug) }}" class="hover:text-forum-base">{{ thread.category.name }}</a>
+  <i class="fas fa-chevron-right text-xs mx-1"></i>
+  <span class="text-gray-700">{{ thread.title }}</span>
+</nav>
+
+<h1 class="text-2xl font-bold text-forum-dark mb-4">{{ thread.title }}</h1>
+
+<article class="bg-white rounded-lg shadow-sm overflow-hidden mb-4">
+  <div class="grid grid-cols-1 md:grid-cols-[180px_1fr]">
+    <div class="bg-gray-50 p-4 border-b md:border-b-0 md:border-r text-center">
+      <div class="w-16 h-16 mx-auto bg-forum-base text-white rounded-full flex items-center justify-center text-xl font-bold">
+        {{ thread.user.full_name[0] }}
+      </div>
+      <div class="font-semibold text-sm mt-2">{{ thread.user.full_name }}</div>
+      <div class="text-xs text-gray-500">{% if thread.user.role == 'admin' %}Quản trị{% else %}Sinh viên{% endif %}</div>
+      {% if thread.user.student_code %}<div class="text-xs text-gray-400 mt-1">{{ thread.user.student_code }}</div>{% endif %}
+    </div>
+    <div class="p-5">
+      <div class="text-xs text-gray-500 border-b pb-2 mb-3">
+        <i class="far fa-clock mr-1"></i> {{ thread.created_at|dt }} ·
+        <i class="far fa-eye mr-1"></i> {{ thread.views }} lượt xem
+      </div>
+      <div class="prose prose-sm max-w-none">{{ thread.content|md|safe }}</div>
+    </div>
+  </div>
+</article>
+
+{% for p in posts %}
+<article class="bg-white rounded-lg shadow-sm overflow-hidden mb-3">
+  <div class="grid grid-cols-1 md:grid-cols-[180px_1fr]">
+    <div class="bg-gray-50 p-4 border-b md:border-b-0 md:border-r text-center">
+      <div class="w-12 h-12 mx-auto bg-gray-400 text-white rounded-full flex items-center justify-center font-bold">
+        {{ p.user.full_name[0] }}
+      </div>
+      <div class="font-semibold text-sm mt-2">{{ p.user.full_name }}</div>
+    </div>
+    <div class="p-5">
+      <div class="text-xs text-gray-500 border-b pb-2 mb-3"><i class="far fa-clock mr-1"></i> {{ p.created_at|relative }}</div>
+      <div class="prose prose-sm max-w-none">{{ p.content|md|safe }}</div>
+    </div>
+  </div>
+</article>
+{% endfor %}
+
+{% if current_user.is_authenticated %}
+<form method="POST" class="bg-white rounded-lg shadow-sm p-5 mt-4">
+  <h3 class="font-bold text-forum-dark mb-3"><i class="fas fa-reply mr-1"></i> Trả lời</h3>
+  <textarea name="content" rows="5" required
+    class="w-full border rounded-lg p-3 text-sm focus:ring-2 focus:ring-forum-base outline-none"
+    placeholder="Nội dung trả lời (hỗ trợ markdown)..."></textarea>
+  <div class="mt-3 flex justify-end">
+    <button class="bg-forum-base hover:bg-forum-dark text-white px-5 py-2 rounded-lg text-sm font-semibold">
+      <i class="fas fa-paper-plane mr-1"></i> Đăng trả lời
+    </button>
+  </div>
+</form>
+{% else %}
+<div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 text-sm">
+  <a href="{{ url_for('auth.login') }}" class="underline font-semibold">Đăng nhập</a> để tham gia thảo luận.
+</div>
+{% endif %}
+{% endblock %}
