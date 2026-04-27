@@ -9,7 +9,7 @@ from flask import Flask, redirect, url_for, render_template
 
 from app.extensions import db, login_manager
 from app.settings import BaseConfig, get_config
-from app.logging import configure_logging
+from app.log_config import configure_logging
 
 log = logging.getLogger(__name__)
 
