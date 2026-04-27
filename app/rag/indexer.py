@@ -11,9 +11,10 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from app.models import (
     Course, ClassSection, Material, Notification, Semester,
-    ForumThread, current_semester, DAY_VN,
+    ForumThread, KnowledgeDocument, current_semester, DAY_VN,
 )
 from app.rag.clients import get_embeddings, get_vectorstore, reset_clients
+from app.rag.loaders import extract_text
 from app.rag.nlp import normalize_vi
 
 log = logging.getLogger(__name__)
@@ -121,6 +122,29 @@ def _collect_forum_threads() -> List[Document]:
     return docs
 
 
+def _collect_knowledge_documents() -> List[Document]:
+    """Đọc file admin upload → split lại trong build_index() (chỉ đặt nội dung gốc ở đây)."""
+    docs = []
+    for kd in KnowledgeDocument.query.filter_by(status="active").all():
+        try:
+            text = extract_text(kd.stored_path)
+        except Exception as e:
+            log.warning("Skip knowledge doc %d (%s): %s", kd.id, kd.title, e)
+            continue
+        if not text.strip():
+            continue
+        docs.append(_doc(
+            text,
+            type="knowledge",
+            title=kd.title,
+            doc_id=kd.id,
+            filename=kd.filename,
+            file_type=kd.file_type,
+            tags=kd.tags or "",
+        ))
+    return docs
+
+
 def _static_knowledge() -> List[Document]:
     """Knowledge cứng không có trong DB — quy chế, công thức, sitemap."""
     items: List[Tuple[str, dict]] = [
@@ -158,6 +182,7 @@ COLLECTORS = [
     _collect_materials,
     _collect_notifications,
     _collect_forum_threads,
+    _collect_knowledge_documents,
     _static_knowledge,
 ]
 
@@ -202,4 +227,15 @@ def build_index() -> int:
     vs = get_vectorstore()
     vs.add_documents(chunks)
     log.info("Indexed %d chunks into ChromaDB at %s", len(chunks), cfg["CHROMA_DIR"])
+
+    # Cập nhật chunk_count + indexed_at cho mỗi KnowledgeDocument
+    from datetime import datetime
+    now = datetime.utcnow()
+    for kd in KnowledgeDocument.query.filter_by(status="active").all():
+        kd_chunks = sum(1 for c in chunks if c.metadata.get("doc_id") == kd.id)
+        if kd_chunks:
+            kd.chunk_count = kd_chunks
+            kd.indexed_at = now
+    from app.extensions import db as _db
+    _db.session.commit()
     return len(chunks)

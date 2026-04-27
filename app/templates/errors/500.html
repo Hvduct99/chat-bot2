@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}500 — Lỗi máy chủ{% endblock %}
+{% block content %}
+<div class="text-center py-20">
+  <i class="fas fa-bug text-6xl text-orange-400 mb-4"></i>
+  <h1 class="text-3xl font-bold text-gray-700 mb-2">500 — Lỗi máy chủ</h1>
+  <p class="text-gray-500 mb-6">Có gì đó không ổn. Vui lòng thử lại hoặc liên hệ quản trị.</p>
+  <a href="{{ url_for('forum.index') }}" class="bg-forum-base hover:bg-forum-dark text-white px-5 py-2 rounded-lg">
+    <i class="fas fa-home mr-1"></i> Về trang chủ
+  </a>
+</div>
+{% endblock %}

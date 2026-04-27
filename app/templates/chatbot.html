@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Chat UniBot — {{ APP_NAME }}{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-forum-dark mb-3">
+  <i class="fas fa-robot mr-1"></i> Trò chuyện với UniBot
+</h1>
+<p class="text-sm text-gray-600 mb-4">
+  Trợ lý AI dùng <b>RAG</b> trên Ollama + Qwen,
+  embeddings <code class="bg-gray-100 px-1.5 py-0.5 rounded">nomic-embed-text</code>,
+  vector store <b>ChromaDB</b>.
+</p>
+
+<div class="bg-white rounded-lg shadow-sm flex flex-col" style="height: calc(100vh - 280px); min-height: 480px;">
+  <div id="chatp-messages" class="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50"></div>
+
+  <div id="chatp-quick" class="px-5 py-2 border-t bg-white overflow-x-auto">
+    <div class="flex gap-2 text-xs whitespace-nowrap">
+      <button class="cp-q px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full hover:bg-blue-100" data-q="Học kỳ này có những môn nào đang mở đăng ký?">Môn đang mở</button>
+      <button class="cp-q px-3 py-1.5 bg-green-50 text-green-700 rounded-full hover:bg-green-100" data-q="Lớp KTPM101 có giảng viên là ai và học vào thứ mấy?">GV của KTPM101</button>
+      <button class="cp-q px-3 py-1.5 bg-purple-50 text-purple-700 rounded-full hover:bg-purple-100" data-q="Có tài liệu nào cho môn cơ sở dữ liệu không?">Tài liệu CSDL</button>
+      <button class="cp-q px-3 py-1.5 bg-orange-50 text-orange-700 rounded-full hover:bg-orange-100" data-q="Cách tính điểm trung bình môn học?">Cách tính điểm</button>
+      <button class="cp-q px-3 py-1.5 bg-pink-50 text-pink-700 rounded-full hover:bg-pink-100" data-q="Thời hạn đăng ký tín chỉ học kỳ này là khi nào?">Thời hạn DK</button>
+    </div>
+  </div>
+
+  <form id="chatp-form" class="px-5 py-4 border-t chat-page-input bg-white">
+    <div class="flex items-end gap-2">
+      <textarea id="chatp-input" rows="1" maxlength="1000"
+        placeholder="Hỏi UniBot về học vụ, môn học, lịch, tài liệu, điểm..."
+        class="flex-1 border rounded-xl px-4 py-3 text-sm resize-none focus:ring-2 focus:ring-forum-base outline-none max-h-40"></textarea>
+      <button type="submit"
+        class="bg-forum-base hover:bg-forum-dark text-white px-5 py-3 rounded-xl flex items-center gap-2 disabled:opacity-50">
+        <i class="fas fa-paper-plane"></i> Gửi
+      </button>
+    </div>
+    <p class="text-xs text-gray-400 mt-2">Tip: Shift+Enter để xuống dòng, Enter để gửi.</p>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/chat-page.js') }}"></script>
+{% endblock %}

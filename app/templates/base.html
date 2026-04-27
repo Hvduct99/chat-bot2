@@ -99,6 +99,12 @@ tailwind.config = {
       <i class="fas fa-chart-line text-orange-600 mr-1"></i> Điểm
     </a>
     {% endif %}
+    {% if current_user.is_authenticated and current_user.is_admin %}
+    <span class="flex-shrink-0 mx-2 text-gray-300">|</span>
+    <a href="{{ url_for('admin.knowledge') }}" class="flex-shrink-0 px-3 py-3 text-sm hover:bg-forum-bg">
+      <i class="fas fa-database text-red-600 mr-1"></i> Knowledge Base
+    </a>
+    {% endif %}
   </div>
 </nav>
 

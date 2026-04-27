@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Điểm — {{ APP_NAME }}{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-forum-dark mb-4">
+  <i class="fas fa-chart-line mr-1"></i> Kết quả học tập
+</h1>
+
+<div class="bg-white rounded-lg shadow-sm overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-forum-dark text-white">
+      <tr>
+        <th class="px-3 py-2.5 text-left">Học kỳ</th>
+        <th class="px-3 py-2.5 text-left">Mã môn</th>
+        <th class="px-3 py-2.5 text-left">Tên môn</th>
+        <th class="px-3 py-2.5 text-center">TC</th>
+        <th class="px-3 py-2.5 text-center">GK</th>
+        <th class="px-3 py-2.5 text-center">CK</th>
+        <th class="px-3 py-2.5 text-center">TB</th>
+        <th class="px-3 py-2.5 text-center">Xếp loại</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in rows %}{% set c = e.class_section.course %}
+        <tr class="border-t hover:bg-gray-50">
+          <td class="px-3 py-2 text-xs">{{ e.semester.name }} {{ e.semester.academic_year }}</td>
+          <td class="px-3 py-2 font-mono text-xs">{{ c.code }}</td>
+          <td class="px-3 py-2 font-medium">{{ c.name }}</td>
+          <td class="px-3 py-2 text-center">{{ c.credits }}</td>
+          <td class="px-3 py-2 text-center">{{ e.midterm_score or '-' }}</td>
+          <td class="px-3 py-2 text-center">{{ e.final_score or '-' }}</td>
+          <td class="px-3 py-2 text-center font-semibold">{{ e.total_score or '-' }}</td>
+          <td class="px-3 py-2 text-center">
+            {% if e.grade %}
+              <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded font-bold text-xs">{{ e.grade }}</span>
+            {% else %}-{% endif %}
+          </td>
+        </tr>
+      {% else %}
+      <tr><td colspan="8" class="px-4 py-8 text-center text-gray-400 italic">Chưa có điểm.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

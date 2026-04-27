@@ -1,0 +1,97 @@
+# =============================================================
+# Stack: Ollama (LLM + embedding) + UniBot Forum (Flask app)
+# Chạy trên Ubuntu hoặc bất kỳ host Docker nào.
+#
+#   docker compose up -d --build
+#   docker compose logs -f app
+#   docker compose exec app flask seed
+#   docker compose exec app flask ingest
+# =============================================================
+
+services:
+
+  # -------------------------------------------------------------
+  # Ollama — local LLM server. Persist models qua volume.
+  # -------------------------------------------------------------
+  ollama:
+    image: ollama/ollama:latest
+    container_name: unibot-ollama
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_HOST_PORT:-11434}:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    # Bật GPU nếu có (xóa block này nếu chỉ dùng CPU)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  # -------------------------------------------------------------
+  # ollama-pull — chạy 1 lần để pull model rồi exit.
+  # -------------------------------------------------------------
+  ollama-pull:
+    image: ollama/ollama:latest
+    container_name: unibot-ollama-pull
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "→ Pulling ${OLLAMA_LLM_MODEL:-qwen2.5:7b}...";
+        ollama pull ${OLLAMA_LLM_MODEL:-qwen2.5:7b};
+        echo "→ Pulling ${OLLAMA_EMBED_MODEL:-nomic-embed-text}...";
+        ollama pull ${OLLAMA_EMBED_MODEL:-nomic-embed-text};
+        echo "✓ Models ready.";
+    restart: "no"
+
+  # -------------------------------------------------------------
+  # App — Flask + RAG + ChromaDB embedded
+  # -------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: unibot-app:latest
+    container_name: unibot-app
+    restart: unless-stopped
+    depends_on:
+      ollama:
+        condition: service_healthy
+      ollama-pull:
+        condition: service_completed_successfully
+    ports:
+      - "${APP_HOST_PORT:-5000}:5000"
+    env_file:
+      - .env
+    environment:
+      FLASK_ENV: ${FLASK_ENV:-production}
+      OLLAMA_BASE_URL: http://ollama:11434
+      DATA_DIR: /app/data
+      DATABASE_URL: sqlite:////app/data/unireg.db
+    volumes:
+      - app-data:/app/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:5000/healthz || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  ollama-models:
+    name: unibot-ollama-models
+  app-data:
+    name: unibot-app-data

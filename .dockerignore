@@ -1,0 +1,44 @@
+# VCS
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local data — sẽ dùng volume
+data/
+uploads/
+*.db
+*.sqlite
+
+# IDE / OS
+.idea/
+.vscode/
+.claude/
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
+*.env.local
+
+# Docs / dev
+*.md
+!README.md
+docs/
+tests/
+.coverage
+htmlcov/

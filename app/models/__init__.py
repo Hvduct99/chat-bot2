@@ -8,6 +8,7 @@ from app.models.academic import (
 )
 from app.models.content import Material, Notification
 from app.models.forum import ForumCategory, ForumThread, ForumPost
+from app.models.knowledge import KnowledgeDocument
 
 __all__ = [
     "User",
@@ -15,4 +16,5 @@ __all__ = [
     "DAY_VN", "calc_grade", "current_semester",
     "Material", "Notification",
     "ForumCategory", "ForumThread", "ForumPost",
+    "KnowledgeDocument",
 ]

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Hồ sơ — {{ APP_NAME }}{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-forum-dark mb-4">
+  <i class="fas fa-id-card mr-1"></i> Hồ sơ cá nhân
+</h1>
+
+<div class="bg-white rounded-lg shadow-sm p-6 max-w-2xl">
+  <div class="flex items-center gap-4 mb-5">
+    <div class="w-20 h-20 bg-forum-base text-white rounded-full flex items-center justify-center text-3xl font-bold">
+      {{ user.full_name[0] }}
+    </div>
+    <div>
+      <h2 class="text-xl font-bold">{{ user.full_name }}</h2>
+      <p class="text-sm text-gray-500">{{ user.email }}</p>
+      {% if user.student_code %}<p class="text-xs text-gray-400 mt-1">MSSV: {{ user.student_code }}</p>{% endif %}
+    </div>
+  </div>
+
+  <dl class="grid grid-cols-2 gap-4 text-sm">
+    <div><dt class="text-xs text-gray-500">Khoa</dt><dd class="font-medium">{{ user.faculty.name if user.faculty else '—' }}</dd></div>
+    <div><dt class="text-xs text-gray-500">Ngành</dt><dd class="font-medium">{{ user.department.name if user.department else '—' }}</dd></div>
+    <div><dt class="text-xs text-gray-500">Năm học</dt><dd class="font-medium">{{ user.academic_year or '—' }}</dd></div>
+    <div><dt class="text-xs text-gray-500">SĐT</dt><dd class="font-medium">{{ user.phone or '—' }}</dd></div>
+    <div><dt class="text-xs text-gray-500">Trạng thái</dt><dd class="font-medium">{{ user.status }}</dd></div>
+    <div><dt class="text-xs text-gray-500">Tham gia</dt><dd class="font-medium">{{ user.created_at|dt('%d/%m/%Y') }}</dd></div>
+  </dl>
+</div>
+{% endblock %}

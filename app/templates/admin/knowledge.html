@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Quản lý Knowledge — {{ APP_NAME }}{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-forum-dark mb-4">
+  <i class="fas fa-database mr-1"></i> Knowledge Base — RAG
+  <span class="text-sm font-normal text-gray-500">{{ items|length }} tài liệu</span>
+</h1>
+
+<!-- Upload form -->
+<form method="POST" action="{{ url_for('admin.upload') }}" enctype="multipart/form-data"
+      class="bg-white rounded-lg shadow-sm p-5 mb-6">
+  <h2 class="font-bold text-forum-dark mb-3"><i class="fas fa-upload mr-1"></i> Upload tài liệu mới</h2>
+  <div class="grid md:grid-cols-2 gap-3">
+    <div>
+      <label class="block text-sm font-semibold mb-1">Tiêu đề *</label>
+      <input name="title" required class="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-forum-base">
+    </div>
+    <div>
+      <label class="block text-sm font-semibold mb-1">Tags (cách nhau dấu phẩy)</label>
+      <input name="tags" placeholder="quy chế, học vụ" class="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-forum-base">
+    </div>
+  </div>
+
+  <div class="mt-3">
+    <label class="block text-sm font-semibold mb-1">Mô tả ngắn</label>
+    <textarea name="description" rows="2" class="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-forum-base"></textarea>
+  </div>
+
+  <div class="mt-3">
+    <label class="block text-sm font-semibold mb-1">File (PDF / DOCX / TXT / MD, tối đa 25 MB) *</label>
+    <input type="file" name="file" required accept=".pdf,.docx,.txt,.md"
+           class="w-full border rounded-lg px-3 py-2 outline-none">
+  </div>
+
+  <label class="inline-flex items-center mt-3 text-sm">
+    <input type="checkbox" name="auto_index" checked class="mr-2"> Tự động index vào ChromaDB ngay sau upload
+  </label>
+
+  <div class="mt-4 flex justify-end">
+    <button class="bg-forum-base hover:bg-forum-dark text-white px-5 py-2 rounded-lg text-sm font-semibold">
+      <i class="fas fa-cloud-upload-alt mr-1"></i> Upload & Index
+    </button>
+  </div>
+</form>
+
+<!-- Documents table -->
+<div class="bg-white rounded-lg shadow-sm overflow-x-auto">
+  <table class="w-full text-sm min-w-[800px]">
+    <thead class="bg-forum-dark text-white">
+      <tr>
+        <th class="px-3 py-2.5 text-left">Tiêu đề</th>
+        <th class="px-3 py-2.5 text-left">File</th>
+        <th class="px-3 py-2.5 text-center">Loại</th>
+        <th class="px-3 py-2.5 text-right">Kích thước</th>
+        <th class="px-3 py-2.5 text-right">Chunks</th>
+        <th class="px-3 py-2.5 text-left">Index lúc</th>
+        <th class="px-3 py-2.5"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in items %}
+      <tr class="border-t hover:bg-gray-50">
+        <td class="px-3 py-2.5">
+          <div class="font-medium text-forum-dark">{{ d.title }}</div>
+          {% if d.description %}<div class="text-xs text-gray-500 line-clamp-1">{{ d.description }}</div>{% endif %}
+          {% if d.tags %}
+            {% for tag in d.tags.split(',') %}
+              <span class="inline-block bg-blue-50 text-blue-700 text-xs px-2 py-0.5 rounded mr-1 mt-1">{{ tag.strip() }}</span>
+            {% endfor %}
+          {% endif %}
+        </td>
+        <td class="px-3 py-2.5 text-xs text-gray-600 break-all">{{ d.filename }}</td>
+        <td class="px-3 py-2.5 text-center">
+          <span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded uppercase font-mono">{{ d.file_type }}</span>
+        </td>
+        <td class="px-3 py-2.5 text-right text-xs text-gray-600">
+          {{ '%.1f'|format(d.file_size / 1024) }} KB
+        </td>
+        <td class="px-3 py-2.5 text-right">
+          {% if d.chunk_count %}
+            <span class="text-green-700 font-semibold">{{ d.chunk_count }}</span>
+          {% else %}
+            <span class="text-gray-400">—</span>
+          {% endif %}
+        </td>
+        <td class="px-3 py-2.5 text-xs">
+          {% if d.indexed_at %}
+            <span class="text-gray-700">{{ d.indexed_at|dt('%d/%m %H:%M') }}</span>
+          {% else %}
+            <span class="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-xs">Chưa index</span>
+          {% endif %}
+        </td>
+        <td class="px-3 py-2.5 text-right whitespace-nowrap">
+          <form method="POST" action="{{ url_for('admin.reindex', doc_id=d.id) }}" class="inline">
+            <button class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-xs font-semibold" title="Re-index">
+              <i class="fas fa-sync"></i>
+            </button>
+          </form>
+          <form method="POST" action="{{ url_for('admin.delete', doc_id=d.id) }}" class="inline"
+                onsubmit="return confirm('Xóa &quot;{{ d.title }}&quot;?')">
+            <button class="bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1 rounded text-xs font-semibold" title="Xóa">
+              <i class="fas fa-trash"></i>
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="px-4 py-10 text-center text-gray-400 italic">
+        Chưa có tài liệu nào. Upload file đầu tiên ở form bên trên.
+      </td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="mt-4 bg-blue-50 border border-blue-200 rounded p-3 text-xs text-blue-800">
+  <i class="fas fa-info-circle mr-1"></i>
+  Mọi file upload sẽ được parse, chia chunk và embed vào ChromaDB.
+  UniBot tự dùng tri thức này để trả lời sinh viên.
+</div>
+{% endblock %}
